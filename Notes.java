@@ -1,5 +1,5 @@
 
-//BeleskeGUI means NotesGUI. This was codename at the beginnig. I am lazy to change it. Don't judge me
+//BeleskeGUI means NotesGUI, codename of this project. I am lazy to change it. Don't judge me.
 
 import java.awt.Color;
 import java.awt.Font;
@@ -27,7 +27,6 @@ public class BeleskeGUI extends javax.swing.JFrame {
         buttonGroup1.add(jRadioButton3);
     }
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jMenu1 = new javax.swing.JMenu();
@@ -249,13 +248,13 @@ public class BeleskeGUI extends javax.swing.JFrame {
         );
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
-        snimi();
-    }//GEN-LAST:event_jButton1MouseClicked
-
-    private void snimi() {
+        save();
+    }
+    
+    private void save() {
         int i = fileChooser.showSaveDialog(this);
         File datoteka = fileChooser.getSelectedFile();
         PrintWriter printWriter = null;
@@ -271,7 +270,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
     }
     
     private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
-        if(saved == false) if(JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Exit", JOptionPane.YES_NO_OPTION) == 0) snimi();
+        if(saved == false) if(JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Exit", JOptionPane.YES_NO_OPTION) == 0) save();
         int i = fileChooser.showOpenDialog(this);
         if(i == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
@@ -286,22 +285,22 @@ public class BeleskeGUI extends javax.swing.JFrame {
                     + "Close all programs and try again.");
             } catch(NullPointerException e) {} finally { scanner.close(); }
         }
-    }//GEN-LAST:event_jButton2MouseClicked
+    }
 
     private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
         fontType = Font.PLAIN;
         jTextArea1.setFont(new Font(font, fontType, fontSize));
-    }//GEN-LAST:event_jRadioButton1ActionPerformed
+    }
 
     private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
         fontType = Font.BOLD;
         jTextArea1.setFont(new Font(font, fontType, fontSize));
-    }//GEN-LAST:event_jRadioButton2ActionPerformed
+    }
 
     private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
         fontType = Font.ITALIC;
         jTextArea1.setFont(new Font(font, fontType, fontSize));
-    }//GEN-LAST:event_jRadioButton3ActionPerformed
+    }
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         switch(jComboBox1.getSelectedIndex()) {
@@ -313,7 +312,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
             case 5: font = "Comic Sans MS"; break;
         }
         jTextArea1.setFont(new Font(font, fontType, fontSize));
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+    }
 
     private void jComboBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox2ActionPerformed
         switch(jComboBox2.getSelectedIndex()) {                                  
@@ -329,7 +328,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
             case 9: background = Color.ORANGE; break;
         }
         jTextArea1.setBackground(background);
-    }//GEN-LAST:event_jComboBox2ActionPerformed
+    }
 
     private void jComboBox3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox3ActionPerformed
         switch(jComboBox3.getSelectedIndex()) {                                  
@@ -345,26 +344,26 @@ public class BeleskeGUI extends javax.swing.JFrame {
             case 9: text = Color.ORANGE; break;
         }
         jTextArea1.setForeground(text);
-    }//GEN-LAST:event_jComboBox3ActionPerformed
+    }
 
     private void jComboBox4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox4ActionPerformed
         try {
             fontSize = Integer.parseInt(jComboBox4.getSelectedItem().toString());
         } catch(Exception e) { fontSize = 12; }
         finally { jTextArea1.setFont(new Font(font, fontType, fontSize)); }
-    }//GEN-LAST:event_jComboBox4ActionPerformed
+    }
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         if(saved == false) 
-            if(JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Exit", JOptionPane.YES_NO_OPTION) == 0) snimi();
-    }//GEN-LAST:event_formWindowClosing
+            if(JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Exit", JOptionPane.YES_NO_OPTION) == 0) save();
+    }
 
     private void jTextArea1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextArea1KeyTyped
         saved = false;
-    }//GEN-LAST:event_jTextArea1KeyTyped
+    }
 
     private void jButton4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton4MouseClicked
-        if(path == null) snimi(); else {
+        if(path == null) save(); else {
             PrintWriter printWriter = null;
             try {
                 printWriter = new PrintWriter(path);
@@ -375,13 +374,8 @@ public class BeleskeGUI extends javax.swing.JFrame {
                     + "Pokusajte ponovo kasnije i zatvorite ostale programe.");
             } catch(NullPointerException e) {} finally { printWriter.close(); }
         }
-    }//GEN-LAST:event_jButton4MouseClicked
+    }
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -398,21 +392,14 @@ public class BeleskeGUI extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(BeleskeGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
 
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new BeleskeGUI().setVisible(true);
             }
         });
     }
-    
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.ButtonGroup buttonGroup2;
-    private javax.swing.ButtonGroup buttonGroup3;
-    private javax.swing.ButtonGroup buttonGroup4;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton4;
@@ -435,5 +422,4 @@ public class BeleskeGUI extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator7;
     private javax.swing.JSeparator jSeparator8;
     private javax.swing.JTextArea jTextArea1;
-    // End of variables declaration//GEN-END:variables
 }
