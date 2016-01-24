@@ -1,26 +1,46 @@
+package program;
+
 //BeleskeGUI (NotesGUI in english) is codename of this project. Don't judge me.
+
+
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 public class BeleskeGUI extends javax.swing.JFrame {
     JFileChooser fileChooser = new JFileChooser();
-    int fontSize = 12;
-    int fontType = Font.PLAIN;
+    int[] fontSize = new int[5];
+    int[] fontType = new int[5];
     boolean[] saved = new boolean[5];
-    Color background = Color.WHITE;
-    Color text = Color.BLACK;
-    String font = "SansSerif";
+    Color[] background = new Color[5];
+    Color[] text = new Color[5];
     String path;
-    public BeleskeGUI() {
+    public BeleskeGUI() throws FontFormatException, IOException {
         initComponents();
-        for(int i = 0; i < 5; i++) saved[i] = true;
+        //intialize variables
+        for(int i = 0; i < 5; i++) { 
+            saved[i] = true;
+            text[i] = Color.BLACK;
+            background[i] = Color.WHITE;
+            fontSize[i] = 12;
+            fontType[i] = Font.PLAIN;
+        }
+        jTextArea1.setFont(new Font(Font.SANS_SERIF, fontType[0], fontSize[0]));
+        jTextArea2.setFont(new Font(Font.SANS_SERIF, fontType[1], fontSize[1]));
+        jTextArea3.setFont(new Font(Font.SANS_SERIF, fontType[2], fontSize[2]));
+        jTextArea4.setFont(new Font(Font.SANS_SERIF, fontType[3], fontSize[3]));
+        jTextArea5.setFont(new Font(Font.SANS_SERIF, fontType[4], fontSize[4]));
     }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -39,11 +59,9 @@ public class BeleskeGUI extends javax.swing.JFrame {
         jRadioButton2 = new javax.swing.JRadioButton();
         jRadioButton3 = new javax.swing.JRadioButton();
         jSeparator2 = new javax.swing.JSeparator();
-        jComboBox1 = new javax.swing.JComboBox();
         jSeparator4 = new javax.swing.JSeparator();
         jSeparator5 = new javax.swing.JSeparator();
         jSeparator6 = new javax.swing.JSeparator();
-        jSeparator7 = new javax.swing.JSeparator();
         jSeparator8 = new javax.swing.JSeparator();
         jLabel2 = new javax.swing.JLabel();
         jComboBox2 = new javax.swing.JComboBox();
@@ -72,8 +90,8 @@ public class BeleskeGUI extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Notes");
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        setIconImage(new ImageIcon(getClass().getResource("/icons/icon1-100px.png")).getImage());
         setMinimumSize(new java.awt.Dimension(600, 300));
-        setPreferredSize(new java.awt.Dimension(1024, 600));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -81,6 +99,8 @@ public class BeleskeGUI extends javax.swing.JFrame {
         });
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/save-as-icon20px.png"))); // NOI18N
+        jButton1.setToolTipText("Save file as");
+        jButton1.setFocusable(false);
         jButton1.setMaximumSize(new java.awt.Dimension(32, 32));
         jButton1.setMinimumSize(new java.awt.Dimension(32, 32));
         jButton1.setPreferredSize(new java.awt.Dimension(32, 32));
@@ -91,6 +111,8 @@ public class BeleskeGUI extends javax.swing.JFrame {
         });
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/open-icon20px.png"))); // NOI18N
+        jButton2.setToolTipText("Open file");
+        jButton2.setFocusable(false);
         jButton2.setMaximumSize(new java.awt.Dimension(32, 32));
         jButton2.setMinimumSize(new java.awt.Dimension(32, 32));
         jButton2.setPreferredSize(new java.awt.Dimension(32, 32));
@@ -107,6 +129,8 @@ public class BeleskeGUI extends javax.swing.JFrame {
         buttonGroup1.add(jRadioButton1);
         jRadioButton1.setSelected(true);
         jRadioButton1.setText("Plain");
+        jRadioButton1.setToolTipText("Chnage font type to plain");
+        jRadioButton1.setFocusable(false);
         jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButton1ActionPerformed(evt);
@@ -116,6 +140,8 @@ public class BeleskeGUI extends javax.swing.JFrame {
         buttonGroup1.add(jRadioButton2);
         jRadioButton2.setFont(new java.awt.Font("sansserif", 1, 12)); // NOI18N
         jRadioButton2.setText("Bold");
+        jRadioButton2.setToolTipText("Chnage font type to bold");
+        jRadioButton2.setFocusable(false);
         jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButton2ActionPerformed(evt);
@@ -125,6 +151,8 @@ public class BeleskeGUI extends javax.swing.JFrame {
         buttonGroup1.add(jRadioButton3);
         jRadioButton3.setFont(new java.awt.Font("sansserif", 2, 12)); // NOI18N
         jRadioButton3.setText("Italic");
+        jRadioButton3.setToolTipText("Change font type to italic");
+        jRadioButton3.setFocusable(false);
         jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButton3ActionPerformed(evt);
@@ -133,26 +161,19 @@ public class BeleskeGUI extends javax.swing.JFrame {
 
         jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SansSerif", "Arial Black", "Consolas", "Impact", "Mistral", "Comic Sans MS" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
-            }
-        });
-
         jSeparator4.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
         jSeparator5.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
         jSeparator6.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
-        jSeparator7.setOrientation(javax.swing.SwingConstants.VERTICAL);
-
         jSeparator8.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
         jLabel2.setText("Color:");
 
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "White", "Black", "Gray", "Light gray", "Dark gray", "Yellow", "Blue", "Red", "Green", "Orange" }));
+        jComboBox2.setToolTipText("Change background color of current tab");
+        jComboBox2.setFocusable(false);
         jComboBox2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox2ActionPerformed(evt);
@@ -161,6 +182,8 @@ public class BeleskeGUI extends javax.swing.JFrame {
 
         jComboBox3.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "White", "Black", "Gray", "Light gray", "Dark gray", "Yellow", "Blue", "Red", "Green", "Orange" }));
         jComboBox3.setSelectedIndex(1);
+        jComboBox3.setToolTipText("Change text color of current tab");
+        jComboBox3.setFocusable(false);
         jComboBox3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox3ActionPerformed(evt);
@@ -168,6 +191,8 @@ public class BeleskeGUI extends javax.swing.JFrame {
         });
 
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/save-icon20px.png"))); // NOI18N
+        jButton4.setToolTipText("Save file");
+        jButton4.setFocusable(false);
         jButton4.setMaximumSize(new java.awt.Dimension(32, 32));
         jButton4.setMinimumSize(new java.awt.Dimension(32, 32));
         jButton4.setPreferredSize(new java.awt.Dimension(32, 32));
@@ -177,9 +202,9 @@ public class BeleskeGUI extends javax.swing.JFrame {
             }
         });
 
-        jComboBox4.setEditable(true);
         jComboBox4.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "3", "5", "8", "12", "14", "16", "18", "20", "24", "38", "72", " " }));
         jComboBox4.setSelectedIndex(3);
+        jComboBox4.setToolTipText("Change font size of current tab");
         jComboBox4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox4ActionPerformed(evt);
@@ -187,8 +212,14 @@ public class BeleskeGUI extends javax.swing.JFrame {
         });
 
         jTabbedPane1.setName(""); // NOI18N
+        jTabbedPane1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTabbedPane1MouseClicked(evt);
+            }
+        });
 
         jTextArea1.setColumns(20);
+        jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
         jTextArea1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
@@ -322,10 +353,6 @@ public class BeleskeGUI extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(6, 6, 6)
                         .addComponent(jRadioButton1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jRadioButton2)
@@ -358,9 +385,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
                     .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jSeparator8, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -403,6 +428,59 @@ public class BeleskeGUI extends javax.swing.JFrame {
                 + "Close all programs and try again.");
         } catch(NullPointerException e) {} finally { printWriter.close(); }
     }
+    //change info shown in ribbon when user changes tab
+    private void updateInfo(int i) {
+        setTitle("Notes - " + jTabbedPane1.getTitleAt(i));
+        switch(fontType[i]) {
+            case Font.PLAIN: jRadioButton1.setSelected(true); break;
+            case Font.BOLD: jRadioButton2.setSelected(true); break;
+            case Font.ITALIC: jRadioButton3.setSelected(true); break;
+        }
+        if(background[i].equals(Color.WHITE)) jComboBox2.setSelectedIndex(0); else  
+        if(background[i].equals(Color.BLACK)) jComboBox2.setSelectedIndex(1); else
+        if(background[i].equals(Color.GRAY)) jComboBox2.setSelectedIndex(2); else
+        if(background[i].equals(Color.LIGHT_GRAY)) jComboBox2.setSelectedIndex(3); else
+        if(background[i].equals(Color.DARK_GRAY)) jComboBox2.setSelectedIndex(4); else
+        if(background[i].equals(Color.YELLOW)) jComboBox2.setSelectedIndex(5); else
+        if(background[i].equals(Color.BLUE)) jComboBox2.setSelectedIndex(6); else
+        if(background[i].equals(Color.RED)) jComboBox2.setSelectedIndex(7); else
+        if(background[i].equals(Color.GREEN)) jComboBox2.setSelectedIndex(8); else
+        if(background[i].equals(Color.ORANGE)) jComboBox2.setSelectedIndex(9);
+        if(text[i].equals(Color.WHITE)) jComboBox3.setSelectedIndex(0); else  
+        if(text[i].equals(Color.BLACK)) jComboBox3.setSelectedIndex(1); else
+        if(text[i].equals(Color.GRAY)) jComboBox3.setSelectedIndex(2); else
+        if(text[i].equals(Color.LIGHT_GRAY)) jComboBox3.setSelectedIndex(3); else
+        if(text[i].equals(Color.DARK_GRAY)) jComboBox3.setSelectedIndex(4); else
+        if(text[i].equals(Color.YELLOW)) jComboBox3.setSelectedIndex(5); else
+        if(text[i].equals(Color.BLUE)) jComboBox3.setSelectedIndex(6); else
+        if(text[i].equals(Color.RED)) jComboBox3.setSelectedIndex(7); else
+        if(text[i].equals(Color.GREEN)) jComboBox3.setSelectedIndex(8); else
+        if(text[i].equals(Color.ORANGE)) jComboBox3.setSelectedIndex(9);
+        switch(fontSize[i]) {
+            case 3: jComboBox4.setSelectedIndex(0); break;
+            case 5: jComboBox4.setSelectedIndex(1); break;
+            case 8: jComboBox4.setSelectedIndex(2); break;
+            case 12: jComboBox4.setSelectedIndex(3); break;
+            case 14: jComboBox4.setSelectedIndex(4); break;
+            case 16: jComboBox4.setSelectedIndex(5); break;
+            case 18: jComboBox4.setSelectedIndex(6); break;
+            case 20: jComboBox4.setSelectedIndex(7); break;
+            case 24: jComboBox4.setSelectedIndex(8); break;
+            case 38: jComboBox4.setSelectedIndex(9); break;
+            case 72: jComboBox4.setSelectedIndex(10); break;
+        }
+    }
+    //change font size and type of current tab
+    private void setFont() {
+        int i = jTabbedPane1.getSelectedIndex();
+        switch(i) {
+            case 0: jTextArea1.setFont(new Font(Font.SANS_SERIF, fontType[i], fontSize[i])); break;
+            case 1: jTextArea2.setFont(new Font(Font.SANS_SERIF, fontType[i], fontSize[i])); break;
+            case 2: jTextArea3.setFont(new Font(Font.SANS_SERIF, fontType[i], fontSize[i])); break;
+            case 3: jTextArea4.setFont(new Font(Font.SANS_SERIF, fontType[i], fontSize[i])); break;
+            case 4: jTextArea5.setFont(new Font(Font.SANS_SERIF, fontType[i], fontSize[i])); break;
+        }
+    }
     //open file
     private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
         if(saved[jTabbedPane1.getSelectedIndex()] == false) if(JOptionPane.showConfirmDialog(this, "Do you want to save changes?", jTabbedPane1.getTitleAt(jTabbedPane1.getSelectedIndex()), JOptionPane.YES_NO_OPTION) == 0) save();
@@ -443,71 +521,72 @@ public class BeleskeGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2MouseClicked
     //change font type to plain
     private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
-        fontType = Font.PLAIN;
-        jTextArea1.setFont(new Font(font, fontType, fontSize));
+        fontType[jTabbedPane1.getSelectedIndex()] = Font.PLAIN;
+        setFont();
     }//GEN-LAST:event_jRadioButton1ActionPerformed
     //change font type to bold
     private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
-        fontType = Font.BOLD;
-        jTextArea1.setFont(new Font(font, fontType, fontSize));
+        fontType[jTabbedPane1.getSelectedIndex()] = Font.BOLD;
+        setFont();
     }//GEN-LAST:event_jRadioButton2ActionPerformed
     //change font type to italic
     private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
-        fontType = Font.ITALIC;
-        jTextArea1.setFont(new Font(font, fontType, fontSize));
+        fontType[jTabbedPane1.getSelectedIndex()] = Font.ITALIC;
+        setFont();
     }//GEN-LAST:event_jRadioButton3ActionPerformed
-    //change font 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        switch(jComboBox1.getSelectedIndex()) {
-            case 0: font = "SansSerif"; break;
-            case 1: font = "Arial Black"; break;
-            case 2: font = "Consolas"; break;
-            case 3: font = "Impact"; break;
-            case 4: font = "Mistral"; break;
-            case 5: font = "Comic Sans MS"; break;
-        }
-        jTextArea1.setFont(new Font(font, fontType, fontSize));
-    }//GEN-LAST:event_jComboBox1ActionPerformed
-    //change background color
+    //change background color of each idividual text area 
     private void jComboBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox2ActionPerformed
+        //it is fucking more readable, ain't it??
+        int i = jTabbedPane1.getSelectedIndex();
         switch(jComboBox2.getSelectedIndex()) {                                  
-            case 0: background = Color.WHITE; break;
-            case 1: background = Color.BLACK; break;
-            case 2: background = Color.GRAY; break;
-            case 3: background = Color.LIGHT_GRAY; break;
-            case 4: background = Color.DARK_GRAY; break;
-            case 5: background = Color.YELLOW; break;
-            case 6: background = Color.BLUE; break;
-            case 7: background = Color.RED; break;
-            case 8: background = Color.GREEN; break;
-            case 9: background = Color.ORANGE; break;
+            case 0: background[i] = Color.WHITE; break;
+            case 1: background[i] = Color.BLACK; break;
+            case 2: background[i] = Color.GRAY; break;
+            case 3: background[i] = Color.LIGHT_GRAY; break;
+            case 4: background[i] = Color.DARK_GRAY; break;
+            case 5: background[i] = Color.YELLOW; break;
+            case 6: background[i] = Color.BLUE; break;
+            case 7: background[i] = Color.RED; break;
+            case 8: background[i] = Color.GREEN; break;
+            case 9: background[i] = Color.ORANGE; break;
         }
-        jTextArea1.setBackground(background);
+        switch(i) {
+            case 0: jTextArea1.setBackground(background[i]); break;
+            case 1: jTextArea2.setBackground(background[i]); break;
+            case 2: jTextArea3.setBackground(background[i]); break;
+            case 3: jTextArea4.setBackground(background[i]); break;
+            case 4: jTextArea5.setBackground(background[i]); break;
+        }
     }//GEN-LAST:event_jComboBox2ActionPerformed
-    //change text color
+    //change foreground color of each individual text area  
     private void jComboBox3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox3ActionPerformed
+        int i = jTabbedPane1.getSelectedIndex();
         switch(jComboBox3.getSelectedIndex()) {                                  
-            case 0: text = Color.WHITE; break;
-            case 1: text = Color.BLACK; break;
-            case 2: text = Color.GRAY; break;
-            case 3: text = Color.LIGHT_GRAY; break;
-            case 4: text = Color.DARK_GRAY; break;
-            case 5: text = Color.YELLOW; break;
-            case 6: text = Color.BLUE; break;
-            case 7: text = Color.RED; break;
-            case 8: text = Color.GREEN; break;
-            case 9: text = Color.ORANGE; break;
+            case 0: text[i] = Color.WHITE; break;
+            case 1: text[i] = Color.BLACK; break;
+            case 2: text[i] = Color.GRAY; break;
+            case 3: text[i] = Color.LIGHT_GRAY; break;
+            case 4: text[i] = Color.DARK_GRAY; break;
+            case 5: text[i] = Color.YELLOW; break;
+            case 6: text[i] = Color.BLUE; break;
+            case 7: text[i] = Color.RED; break;
+            case 8: text[i] = Color.GREEN; break;
+            case 9: text[i] = Color.ORANGE; break;
         }
-        jTextArea1.setForeground(text);
+        switch(i) {
+            case 0: jTextArea1.setForeground(text[i]); break;
+            case 1: jTextArea2.setForeground(text[i]); break;
+            case 2: jTextArea3.setForeground(text[i]); break;
+            case 3: jTextArea4.setForeground(text[i]); break;
+            case 4: jTextArea5.setForeground(text[i]); break;
+        }
     }//GEN-LAST:event_jComboBox3ActionPerformed
-    //change font size
+    //change font size of each individual text area
     private void jComboBox4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox4ActionPerformed
-        try {
-            fontSize = Integer.parseInt(jComboBox4.getSelectedItem().toString());
-        } catch(Exception e) { fontSize = 12; }
-        finally { jTextArea1.setFont(new Font(font, fontType, fontSize)); }
+        try { fontSize[jTabbedPane1.getSelectedIndex()] = Integer.parseInt(jComboBox4.getSelectedItem().toString()); } 
+        catch(Exception e) { } finally { setFont(); }
     }//GEN-LAST:event_jComboBox4ActionPerformed
-    //check if user saved his work befor closing
+    //check if user saved his work before exiting
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         for(int i = 0; i < 5; i++) {
             jTabbedPane1.setSelectedIndex(i);
@@ -515,7 +594,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
                 if(JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Exit - " + jTabbedPane1.getTitleAt(jTabbedPane1.getSelectedIndex()), JOptionPane.YES_NO_OPTION) == 0) save();
         }
     }//GEN-LAST:event_formWindowClosing
-    //save file
+    //save file 
     private void jButton4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton4MouseClicked
         if(path == null) save(); else {
             PrintWriter printWriter = null;
@@ -529,11 +608,15 @@ public class BeleskeGUI extends javax.swing.JFrame {
             } catch(NullPointerException e) {} finally { printWriter.close(); }
         }
     }//GEN-LAST:event_jButton4MouseClicked
-
+    //set variable saved to false is user typed something (all text areas use this method for keyTyped event)
     private void jTextArea1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextArea1KeyTyped
         saved[jTabbedPane1.getSelectedIndex()] = false;
     }//GEN-LAST:event_jTextArea1KeyTyped
-    public static void main(String args[]) {
+
+    private void jTabbedPane1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTabbedPane1MouseClicked
+        updateInfo(jTabbedPane1.getSelectedIndex());
+    }//GEN-LAST:event_jTabbedPane1MouseClicked
+    public static void main(String args[]) throws FileNotFoundException {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -560,7 +643,11 @@ public class BeleskeGUI extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new BeleskeGUI().setVisible(true);
+                try {
+                    new BeleskeGUI().setVisible(true);
+                } catch (Exception ex) {
+                    Logger.getLogger(BeleskeGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
@@ -570,7 +657,6 @@ public class BeleskeGUI extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton4;
-    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JComboBox jComboBox2;
     private javax.swing.JComboBox jComboBox3;
     private javax.swing.JComboBox jComboBox4;
@@ -595,13 +681,12 @@ public class BeleskeGUI extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSeparator jSeparator6;
-    private javax.swing.JSeparator jSeparator7;
     private javax.swing.JSeparator jSeparator8;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextArea jTextArea2;
-    private javax.swing.JTextArea jTextArea3;
-    private javax.swing.JTextArea jTextArea4;
+    private static javax.swing.JTabbedPane jTabbedPane1;
+    private static javax.swing.JTextArea jTextArea1;
+    private static javax.swing.JTextArea jTextArea2;
+    private static javax.swing.JTextArea jTextArea3;
+    private static javax.swing.JTextArea jTextArea4;
     private javax.swing.JTextArea jTextArea5;
     // End of variables declaration//GEN-END:variables
 }
