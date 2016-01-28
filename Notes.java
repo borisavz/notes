@@ -2,21 +2,31 @@ package program;
 
 //BeleskeGUI (NotesGUI in english) is codename of this project. Don't judge me.
 
-
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
 
 public class BeleskeGUI extends javax.swing.JFrame {
     JFileChooser fileChooser = new JFileChooser();
@@ -26,6 +36,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
     Color[] background = new Color[5];
     Color[] text = new Color[5];
     String path;
+    UndoManager[] undoManager = new UndoManager[5];
     public BeleskeGUI() throws FontFormatException, IOException {
         initComponents();
         //intialize variables
@@ -35,12 +46,24 @@ public class BeleskeGUI extends javax.swing.JFrame {
             background[i] = Color.WHITE;
             fontSize[i] = 12;
             fontType[i] = Font.PLAIN;
+            undoManager[i] = new UndoManager();
         }
+        jTextArea1.getDocument().addUndoableEditListener(undoManager[0]);
+        jTextArea2.getDocument().addUndoableEditListener(undoManager[1]);
+        jTextArea3.getDocument().addUndoableEditListener(undoManager[2]);
+        jTextArea4.getDocument().addUndoableEditListener(undoManager[3]);
+        jTextArea5.getDocument().addUndoableEditListener(undoManager[4]);
+        updateInfo(jTabbedPane1.getSelectedIndex());
         jTextArea1.setFont(new Font(Font.SANS_SERIF, fontType[0], fontSize[0]));
         jTextArea2.setFont(new Font(Font.SANS_SERIF, fontType[1], fontSize[1]));
         jTextArea3.setFont(new Font(Font.SANS_SERIF, fontType[2], fontSize[2]));
         jTextArea4.setFont(new Font(Font.SANS_SERIF, fontType[3], fontSize[3]));
         jTextArea5.setFont(new Font(Font.SANS_SERIF, fontType[4], fontSize[4]));
+        jTextArea1.addMouseListener(new MouseAdapter() { public void mouseReleased(MouseEvent e) { contextMenu(e); } });
+        jTextArea2.addMouseListener(new MouseAdapter() { public void mouseReleased(MouseEvent e) { contextMenu(e); } });
+        jTextArea3.addMouseListener(new MouseAdapter() { public void mouseReleased(MouseEvent e) { contextMenu(e); } });
+        jTextArea4.addMouseListener(new MouseAdapter() { public void mouseReleased(MouseEvent e) { contextMenu(e); } });
+        jTextArea5.addMouseListener(new MouseAdapter() { public void mouseReleased(MouseEvent e) { contextMenu(e); } });
     }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -84,6 +107,9 @@ public class BeleskeGUI extends javax.swing.JFrame {
         jPanel5 = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         jTextArea5 = new javax.swing.JTextArea();
+        jSeparator7 = new javax.swing.JSeparator();
+        jButton3 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
 
         jMenu1.setText("jMenu1");
 
@@ -91,7 +117,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
         setTitle("Notes");
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setIconImage(new ImageIcon(getClass().getResource("/icons/icon1-100px.png")).getImage());
-        setMinimumSize(new java.awt.Dimension(600, 300));
+        setMinimumSize(new java.awt.Dimension(610, 300));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -205,6 +231,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
         jComboBox4.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "3", "5", "8", "12", "14", "16", "18", "20", "24", "38", "72", " " }));
         jComboBox4.setSelectedIndex(3);
         jComboBox4.setToolTipText("Change font size of current tab");
+        jComboBox4.setFocusable(false);
         jComboBox4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox4ActionPerformed(evt);
@@ -219,7 +246,6 @@ public class BeleskeGUI extends javax.swing.JFrame {
         });
 
         jTextArea1.setColumns(20);
-        jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
         jTextArea1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
@@ -236,7 +262,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("tab1", jPanel1);
@@ -258,7 +284,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("tab2", jPanel2);
@@ -280,7 +306,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("tab3", jPanel3);
@@ -302,7 +328,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("tab4", jPanel4);
@@ -324,10 +350,31 @@ public class BeleskeGUI extends javax.swing.JFrame {
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("tab5", jPanel5);
+
+        jSeparator7.setOrientation(javax.swing.SwingConstants.VERTICAL);
+
+        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/undo-icon20px.png"))); // NOI18N
+        jButton3.setToolTipText("Undo");
+        jButton3.setFocusable(false);
+        jButton3.setPreferredSize(new java.awt.Dimension(32, 32));
+        jButton3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton3MouseClicked(evt);
+            }
+        });
+
+        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/redo-icon20px.png"))); // NOI18N
+        jButton5.setToolTipText("Redo");
+        jButton5.setFocusable(false);
+        jButton5.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton5MouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -335,10 +382,6 @@ public class BeleskeGUI extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -365,7 +408,17 @@ public class BeleskeGUI extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(jTabbedPane1, javax.swing.GroupLayout.Alignment.TRAILING)
         );
@@ -379,21 +432,30 @@ public class BeleskeGUI extends javax.swing.JFrame {
                     .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(6, 6, 6)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSeparator8, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jRadioButton2)
-                        .addComponent(jRadioButton1)
-                        .addComponent(jRadioButton3))
-                    .addComponent(jLabel2))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jSeparator8, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jRadioButton2)
+                                    .addComponent(jRadioButton1)
+                                    .addComponent(jRadioButton3)))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel2)))
+                        .addGroup(layout.createSequentialGroup()
+                            .addGap(6, 6, 6)
+                            .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jButton5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTabbedPane1))
         );
@@ -402,7 +464,47 @@ public class BeleskeGUI extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    
+    //show context menu
+    private void contextMenu(MouseEvent e) {
+        boolean selected = false;
+        if(e.isPopupTrigger()) {
+            switch(jTabbedPane1.getSelectedIndex()) {
+                case 0: selected = jTextArea1.getSelectionStart() != jTextArea1.getSelectionEnd(); break;
+                case 1: selected = jTextArea2.getSelectionStart() != jTextArea2.getSelectionEnd(); break;
+                case 2: selected = jTextArea3.getSelectionStart() != jTextArea3.getSelectionEnd(); break;
+                case 3: selected = jTextArea4.getSelectionStart() != jTextArea4.getSelectionEnd(); break;
+                case 4: selected = jTextArea5.getSelectionStart() != jTextArea5.getSelectionEnd(); break;
+            }
+            JPopupMenu menu = new JPopupMenu();
+            JMenuItem cut = new JMenuItem(new DefaultEditorKit.CutAction());
+            JMenuItem copy = new JMenuItem(new DefaultEditorKit.CopyAction());
+            JMenuItem paste = new JMenuItem(new DefaultEditorKit.PasteAction());
+            JMenuItem delete = new JMenuItem("Delete");
+            delete.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
+                switch(jTabbedPane1.getSelectedIndex()) {
+                    case 0: jTextArea1.replaceSelection(""); break;
+                    case 1: jTextArea2.replaceSelection(""); break;
+                    case 2: jTextArea3.replaceSelection(""); break;
+                    case 3: jTextArea4.replaceSelection(""); break;
+                    case 4: jTextArea5.replaceSelection(""); break;
+                }
+            } } );
+            cut.setText("Cut");
+            copy.setText("Copy");
+            paste.setText("Paste");
+            cut.setEnabled(selected);
+            copy.setEnabled(selected);
+            delete.setEnabled(selected);
+            paste.setEnabled(true);
+            menu.add(cut);
+            menu.add(copy);
+            menu.add(paste);
+            menu.addSeparator();
+            menu.add(delete);
+            menu.show(e.getComponent(), e.getX(), e.getY());
+        }
+    }
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
         save();
     }//GEN-LAST:event_jButton1MouseClicked
@@ -421,8 +523,10 @@ public class BeleskeGUI extends javax.swing.JFrame {
                 case 3: for(String tekst1 : jTextArea4.getText().split("\n")) printWriter.println(tekst1); break;
                 case 4: for(String tekst1 : jTextArea5.getText().split("\n")) printWriter.println(tekst1); break;
             }
-            saved[jTabbedPane1.getSelectedIndex()] = true;
-            jTabbedPane1.setTitleAt(jTabbedPane1.getSelectedIndex(), file.getName());
+            int i = jTabbedPane1.getSelectedIndex();
+            saved[i] = true;
+            jTabbedPane1.setTitleAt(i, file.getName());
+            updateInfo(i);
         } catch(IOException e) {
             JOptionPane.showMessageDialog(null, "Invalid file.\n"
                 + "Close all programs and try again.");
@@ -487,36 +591,40 @@ public class BeleskeGUI extends javax.swing.JFrame {
         if(fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
             path = file.getAbsolutePath();
-            Scanner scanner = null;
+            BufferedReader bufferedReader = null;
+            String line = null;
             try {
-                scanner = new Scanner(new File(path));
+                bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(path), "UTF-8"));
                 switch(jTabbedPane1.getSelectedIndex()) {
                     case 0:
                         jTextArea1.setText(null);
-                        while(scanner.hasNextLine()) jTextArea1.append(scanner.nextLine() + "\n"); 
+                        while((line = bufferedReader.readLine()) != null) jTextArea1.append(line + "\n");
                         break;
                     case 1:
                         jTextArea2.setText(null);
-                        while(scanner.hasNextLine()) jTextArea2.append(scanner.nextLine() + "\n"); 
+                        while((line = bufferedReader.readLine()) != null) jTextArea2.append(line + "\n"); 
                         break;
                     case 2:
                         jTextArea3.setText(null);
-                        while(scanner.hasNextLine()) jTextArea3.append(scanner.nextLine() + "\n"); 
+                        while((line = bufferedReader.readLine()) != null) jTextArea3.append(line + "\n"); 
                         break;
                     case 3:
                         jTextArea4.setText(null);
-                        while(scanner.hasNextLine()) jTextArea4.append(scanner.nextLine() + "\n"); 
+                        while((line = bufferedReader.readLine()) != null) jTextArea4.append(line + "\n"); 
                         break;
                     case 4:
                         jTextArea5.setText(null);
-                        while(scanner.hasNextLine()) jTextArea5.append(scanner.nextLine() + "\n"); 
+                        while((line = bufferedReader.readLine()) != null) jTextArea5.append(line + "\n"); 
                         break;
                 }
-                jTabbedPane1.setTitleAt(jTabbedPane1.getSelectedIndex(), file.getName());
+                int i = jTabbedPane1.getSelectedIndex();
+                jTabbedPane1.setTitleAt(i, file.getName());
+                updateInfo(i);
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, "Invalid file.\n"
                     + "Close all programs and try again.");
-            } catch(NullPointerException e) {} finally { scanner.close(); }
+            } catch(NullPointerException e) {} finally { try { bufferedReader.close(); } catch (IOException ex) { }
+}
         }
     }//GEN-LAST:event_jButton2MouseClicked
     //change font type to plain
@@ -616,6 +724,16 @@ public class BeleskeGUI extends javax.swing.JFrame {
     private void jTabbedPane1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTabbedPane1MouseClicked
         updateInfo(jTabbedPane1.getSelectedIndex());
     }//GEN-LAST:event_jTabbedPane1MouseClicked
+    //undo changes to the current tab
+    private void jButton3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton3MouseClicked
+        try { undoManager[jTabbedPane1.getSelectedIndex()].undo(); }
+        catch(CannotUndoException e) {}
+    }//GEN-LAST:event_jButton3MouseClicked
+    //redo changes to the current tab
+    private void jButton5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton5MouseClicked
+        try { undoManager[jTabbedPane1.getSelectedIndex()].redo(); }
+        catch(CannotRedoException e) {}
+    }//GEN-LAST:event_jButton5MouseClicked
     public static void main(String args[]) throws FileNotFoundException {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -654,9 +772,14 @@ public class BeleskeGUI extends javax.swing.JFrame {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup buttonGroup2;
+    private javax.swing.ButtonGroup buttonGroup3;
+    private javax.swing.ButtonGroup buttonGroup4;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JComboBox jComboBox2;
     private javax.swing.JComboBox jComboBox3;
     private javax.swing.JComboBox jComboBox4;
@@ -681,6 +804,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSeparator jSeparator6;
+    private javax.swing.JSeparator jSeparator7;
     private javax.swing.JSeparator jSeparator8;
     private static javax.swing.JTabbedPane jTabbedPane1;
     private static javax.swing.JTextArea jTextArea1;
@@ -689,4 +813,5 @@ public class BeleskeGUI extends javax.swing.JFrame {
     private static javax.swing.JTextArea jTextArea4;
     private javax.swing.JTextArea jTextArea5;
     // End of variables declaration//GEN-END:variables
+
 }
