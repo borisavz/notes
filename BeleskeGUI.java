@@ -662,8 +662,11 @@ public class BeleskeGUI extends javax.swing.JFrame {
             updateInfo(i);
         } catch(IOException e) {
             JOptionPane.showMessageDialog(null, "Invalid file.\nClose all programs and try again.");
-        } catch(NullPointerException e) {} 
-        finally { printWriter.close(); }
+        } catch(NullPointerException e) {
+            JOptionPane.showMessageDialog(null, "Invalid file.\nClose all programs and try again.");
+        } finally { 
+            printWriter.close(); 
+        }
     }
     //change info shown in ribbon when user changes tab
     private void updateInfo(int i) {
@@ -671,9 +674,15 @@ public class BeleskeGUI extends javax.swing.JFrame {
         setTitle("Notes - " + jTabbedPane1.getTitleAt(i));
         //change font type selected in ribbon
         switch(fontType[i]) {
-            case Font.PLAIN: plain.setSelected(true); break;
-            case Font.BOLD: bold.setSelected(true); break;
-            case Font.ITALIC: italic.setSelected(true); break;
+            case Font.PLAIN: 
+                plain.setSelected(true); 
+                break;
+            case Font.BOLD: 
+                bold.setSelected(true); 
+                break;
+            case Font.ITALIC: 
+                italic.setSelected(true); 
+                break;
         }
         //change text color selected in ribbon
         if(background[i].equals(Color.WHITE)) 
@@ -706,7 +715,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
         else if(text[i].equals(Color.LIGHT_GRAY)) 
             backgroundColor.setSelectedIndex(LIGHT_GRAY); 
         else if(text[i].equals(Color.DARK_GRAY)) 
-            backgroundColor.setSelectedIndex(DARK_GRAY); 
+            backgroundColor.setSelectedIndex(DARK_GRAY);
         else if(text[i].equals(Color.YELLOW)) 
             backgroundColor.setSelectedIndex(YELLOW); 
         else if(text[i].equals(Color.BLUE)) 
@@ -731,7 +740,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
             case 12: 
                 setFontSize.setSelectedIndex(FONT_SIZE_12); 
                 break;
-            case FONT_SIZE_14: 
+            case 14: 
                 setFontSize.setSelectedIndex(FONT_SIZE_14); 
                 break;
             case 16: 
@@ -996,7 +1005,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
             } catch(IOException e) {
                 JOptionPane.showMessageDialog(null, "Invalid file. Close all programs and try again.");
             } catch(NullPointerException e) {
-                
+                JOptionPane.showMessageDialog(null, "Invalid file. Close all programs and try again.");
             } finally { 
                 printWriter.close(); 
             }
@@ -1010,34 +1019,21 @@ public class BeleskeGUI extends javax.swing.JFrame {
         undo.setEnabled(true);
     }                                   
 
-   //mouse listener would work even if the button is disabled
+    //mouse listener would work even if the button is disabled
     private void undoActionPerformed(java.awt.event.ActionEvent evt) {                                     
-        try {
-            int i = jTabbedPane1.getSelectedIndex();
-            undoManager[i].undo();
-            undo.setEnabled(undoManager[i].canUndo());
-            redo.setEnabled(undoManager[i].canRedo());
-            saved[i] = false;
-        } catch(CannotUndoException e) {
-            
-        }
-        /*even though program shouldn't allow 
-        user to redo/undo something that isn't 
-        redoable/undoable we want our code to be robust
-        tip: you should always know why you're catching an exception*/
+        int i = jTabbedPane1.getSelectedIndex();
+        undoManager[i].undo();
+        undo.setEnabled(undoManager[i].canUndo());
+        redo.setEnabled(undoManager[i].canRedo());
+        saved[i] = false;
     }                                    
 
     private void redoActionPerformed(java.awt.event.ActionEvent evt) {                                     
-        try {
-            int i = jTabbedPane1.getSelectedIndex();
-            undoManager[i].redo();
-            redo.setEnabled(undoManager[i].canRedo());
-            undo.setEnabled(undoManager[i].canUndo());
-            saved[i] = false;
-        } catch(CannotRedoException e) {
-            
-        }
-        //I won't waste space here, read lines 872, 873, 874, 875
+        int i = jTabbedPane1.getSelectedIndex();
+        undoManager[i].redo();
+        redo.setEnabled(undoManager[i].canRedo());
+        undo.setEnabled(undoManager[i].canUndo());
+        saved[i] = false;
     }                                    
 
     private void jTabbedPane1MouseClicked(java.awt.event.MouseEvent evt) {                                          
