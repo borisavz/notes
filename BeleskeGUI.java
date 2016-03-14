@@ -37,8 +37,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.text.DefaultEditorKit;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
 public class BeleskeGUI extends javax.swing.JFrame {
@@ -586,8 +584,8 @@ public class BeleskeGUI extends javax.swing.JFrame {
             cut.setAccelerator(ctrlX);
             copy.setAccelerator(ctrlC);
             paste.setAccelerator(ctrlV);
-            nextTab.setAccelerator(ctrlN);
-            previousTab.setAccelerator(ctrlM);
+            nextTab.setAccelerator(ctrlM);
+            previousTab.setAccelerator(ctrlN);
             cut.setEnabled(selected);
             copy.setEnabled(selected);
             delete.setEnabled(selected);
@@ -619,8 +617,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
             jTabbedPane1.setSelectedIndex(i + 1);
         else 
             jTabbedPane1.setSelectedIndex(i - 1);
-        
-        
+        updateInfo(jTabbedPane1.getSelectedIndex());
     }
     private void saveAsMouseClicked(java.awt.event.MouseEvent evt) {                                    
         //it's obvious why
