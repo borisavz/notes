@@ -1,6 +1,6 @@
 /* BeleskeGUI (NotesGUI in english) is codename of this project. Don't judge me.
  *
- * version 5.5
+ * version 6.1
  * 
  * Developed by Borisav Zivanovic 2016
  *
@@ -31,6 +31,7 @@ import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -43,7 +44,8 @@ public class BeleskeGUI extends javax.swing.JFrame {
     /*macros for index of color selected in ribbon
     tip: using macros can make larger projects easier to understand*/
     private static final int WHITE = 0, BLACK = 1, GRAY = 2, LIGHT_GRAY = 3, 
-            DARK_GRAY = 4, YELLOW = 5, BLUE = 6, RED = 7, GREEN = 8, ORANGE = 9;
+            DARK_GRAY = 4, YELLOW = 5, BLUE = 6, RED = 7, GREEN = 8, ORANGE = 9, 
+            PINK = 10, CUSTOM = 11, NEW_COLOR = 12;
     //macros for font size selected in ribbon
     private static final int FONT_SIZE_3 = 0, FONT_SIZE_5 = 1, FONT_SIZE_8 = 2, 
             FONT_SIZE_12 = 3, FONT_SIZE_14 = 4, FONT_SIZE_16 = 5, FONT_SIZE_18 = 6, 
@@ -53,36 +55,44 @@ public class BeleskeGUI extends javax.swing.JFrame {
     //macros for moving tab
     private static final boolean NEXT_TAB = true, PREVIOUS_TAB = false;
     JFileChooser fileChooser = new JFileChooser();
-    int[] fontSize = new int[5];
-    int[] fontStyle = new int[5];
+    int[] fontSize = new int[5], fontStyle = new int[5];
     boolean[] saved = new boolean[5];
-    Color[] background = new Color[5];
-    Color[] text = new Color[5];
-    String path;
+    Color[] customBackground = new Color[5], customText = new Color[5];
+    String[] path = new String[5];
     UndoManager[] undoManager = new UndoManager[5];
     public BeleskeGUI() throws FontFormatException, IOException {
         initComponents();
+        jTextArea1.setBackground(Color.WHITE);
+        jTextArea1.setForeground(Color.BLACK);
+        jTextArea2.setBackground(Color.WHITE);
+        jTextArea2.setForeground(Color.BLACK);
+        jTextArea3.setBackground(Color.WHITE);
+        jTextArea3.setForeground(Color.BLACK);
+        jTextArea4.setBackground(Color.WHITE);
+        jTextArea4.setForeground(Color.BLACK);
+        jTextArea5.setBackground(Color.WHITE);
+        jTextArea5.setForeground(Color.BLACK);
         //intialize variables
         for(int i = 0; i < 5; i++) { 
             saved[i] = true;
             fontSize[i] = 12;
-            text[i] = Color.BLACK;
-            background[i] = Color.WHITE;
+            customText[i] = Color.BLACK;
+            customBackground[i] = Color.WHITE;
             fontStyle[i] = Font.PLAIN;
             undoManager[i] = new UndoManager();
         }
         //add UndoableEditListener for all 5 tabs
-        jTextArea1.getDocument().addUndoableEditListener(undoManager[0]);
-        jTextArea2.getDocument().addUndoableEditListener(undoManager[1]);
-        jTextArea3.getDocument().addUndoableEditListener(undoManager[2]);
-        jTextArea4.getDocument().addUndoableEditListener(undoManager[3]);
-        jTextArea5.getDocument().addUndoableEditListener(undoManager[4]);
+        jTextArea1.getDocument().addUndoableEditListener(undoManager[TAB_1]);
+        jTextArea2.getDocument().addUndoableEditListener(undoManager[TAB_2]);
+        jTextArea3.getDocument().addUndoableEditListener(undoManager[TAB_3]);
+        jTextArea4.getDocument().addUndoableEditListener(undoManager[TAB_4]);
+        jTextArea5.getDocument().addUndoableEditListener(undoManager[TAB_5]);
         //set default font settings
-        jTextArea1.setFont(new Font(Font.SANS_SERIF, fontStyle[0], fontSize[0]));
-        jTextArea2.setFont(new Font(Font.SANS_SERIF, fontStyle[1], fontSize[1]));
-        jTextArea3.setFont(new Font(Font.SANS_SERIF, fontStyle[2], fontSize[2]));
-        jTextArea4.setFont(new Font(Font.SANS_SERIF, fontStyle[3], fontSize[3]));
-        jTextArea5.setFont(new Font(Font.SANS_SERIF, fontStyle[4], fontSize[4]));
+        jTextArea1.setFont(new Font(Font.SANS_SERIF, fontStyle[TAB_1], fontSize[TAB_1]));
+        jTextArea2.setFont(new Font(Font.SANS_SERIF, fontStyle[TAB_2], fontSize[TAB_2]));
+        jTextArea3.setFont(new Font(Font.SANS_SERIF, fontStyle[TAB_3], fontSize[TAB_3]));
+        jTextArea4.setFont(new Font(Font.SANS_SERIF, fontStyle[TAB_4], fontSize[TAB_4]));
+        jTextArea5.setFont(new Font(Font.SANS_SERIF, fontStyle[TAB_5], fontSize[TAB_5]));
         //MouseListener for opening the context menu
         jTextArea1.addMouseListener(new MouseAdapter() { 
             public void mouseReleased(MouseEvent e) { 
@@ -134,8 +144,8 @@ public class BeleskeGUI extends javax.swing.JFrame {
         jSeparator6 = new javax.swing.JSeparator();
         jSeparator8 = new javax.swing.JSeparator();
         jLabel2 = new javax.swing.JLabel();
-        textColor = new javax.swing.JComboBox();
         backgroundColor = new javax.swing.JComboBox();
+        textColor = new javax.swing.JComboBox();
         save = new javax.swing.JButton();
         setFontSize = new javax.swing.JComboBox();
         jTabbedPane1 = new javax.swing.JTabbedPane();
@@ -158,6 +168,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
         undo = new javax.swing.JButton();
         redo = new javax.swing.JButton();
         position = new javax.swing.JLabel();
+        boldItalic = new javax.swing.JRadioButton();
 
         jMenu1.setText("jMenu1");
 
@@ -203,7 +214,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
         buttonGroup1.add(plain);
         plain.setSelected(true);
         plain.setText("Plain");
-        plain.setToolTipText("Chnage font type to plain");
+        plain.setToolTipText("Chnage font style to plain");
         plain.setFocusable(false);
         plain.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -214,7 +225,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
         buttonGroup1.add(bold);
         bold.setFont(new java.awt.Font("sansserif", 1, 12)); // NOI18N
         bold.setText("Bold");
-        bold.setToolTipText("Chnage font type to bold");
+        bold.setToolTipText("Chnage font style to bold");
         bold.setFocusable(false);
         bold.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -225,7 +236,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
         buttonGroup1.add(italic);
         italic.setFont(new java.awt.Font("sansserif", 2, 12)); // NOI18N
         italic.setText("Italic");
-        italic.setToolTipText("Change font type to italic");
+        italic.setToolTipText("Change font style to italic");
         italic.setFocusable(false);
         italic.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -245,22 +256,21 @@ public class BeleskeGUI extends javax.swing.JFrame {
 
         jLabel2.setText("Color:");
 
-        textColor.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "White", "Black", "Gray", "Light gray", "Dark gray", "Yellow", "Blue", "Red", "Green", "Orange" }));
-        textColor.setToolTipText("Change background color of current tab");
-        textColor.setFocusable(false);
-        textColor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                textColorActionPerformed(evt);
-            }
-        });
-
-        backgroundColor.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "White", "Black", "Gray", "Light gray", "Dark gray", "Yellow", "Blue", "Red", "Green", "Orange" }));
-        backgroundColor.setSelectedIndex(1);
-        backgroundColor.setToolTipText("Change text color of current tab");
+        backgroundColor.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "White", "Black", "Gray", "Light gray", "Dark gray", "Yellow", "Blue", "Red", "Green", "Orange", "Pink", "Custom", "New color..." }));
+        backgroundColor.setToolTipText("Change background color of current tab");
         backgroundColor.setFocusable(false);
         backgroundColor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 backgroundColorActionPerformed(evt);
+            }
+        });
+
+        textColor.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "White", "Black", "Gray", "Light gray", "Dark gray", "Yellow", "Blue", "Red", "Green", "Orange", "Pink", "Custom", "New color..." }));
+        textColor.setToolTipText("Change text color of current tab");
+        textColor.setFocusable(false);
+        textColor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textColorActionPerformed(evt);
             }
         });
 
@@ -306,11 +316,11 @@ public class BeleskeGUI extends javax.swing.JFrame {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 861, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 983, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("tab1", jPanel1);
@@ -328,11 +338,11 @@ public class BeleskeGUI extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 861, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 983, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("tab2", jPanel2);
@@ -350,11 +360,11 @@ public class BeleskeGUI extends javax.swing.JFrame {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 861, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 983, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("tab3", jPanel3);
@@ -372,11 +382,11 @@ public class BeleskeGUI extends javax.swing.JFrame {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 861, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 983, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("tab4", jPanel4);
@@ -394,11 +404,11 @@ public class BeleskeGUI extends javax.swing.JFrame {
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 861, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 983, Short.MAX_VALUE)
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("tab5", jPanel5);
@@ -430,6 +440,17 @@ public class BeleskeGUI extends javax.swing.JFrame {
         position.setText("Position:");
         position.setToolTipText("The cursor position in the text");
 
+        buttonGroup1.add(boldItalic);
+        boldItalic.setFont(new java.awt.Font("sansserif", 3, 12)); // NOI18N
+        boldItalic.setText("Bold Italic");
+        boldItalic.setToolTipText("Change font style to bold italic");
+        boldItalic.setFocusable(false);
+        boldItalic.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                boldItalicActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -438,13 +459,10 @@ public class BeleskeGUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(6, 6, 6)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(89, 89, 89))
+                    .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(save, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(6, 6, 6)
@@ -463,23 +481,25 @@ public class BeleskeGUI extends javax.swing.JFrame {
                         .addComponent(bold)
                         .addGap(6, 6, 6)
                         .addComponent(italic)
-                        .addGap(6, 6, 6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(boldItalic)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jSeparator8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(6, 6, 6)
                         .addComponent(jLabel2)
                         .addGap(6, 6, 6)
-                        .addComponent(textColor, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(6, 6, 6)
                         .addComponent(backgroundColor, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(6, 6, 6)
+                        .addComponent(textColor, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(6, 6, 6)
                         .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(6, 6, 6)
                         .addComponent(undo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(6, 6, 6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(redo, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(position, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())))
+                        .addComponent(position, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -489,35 +509,32 @@ public class BeleskeGUI extends javax.swing.JFrame {
                     .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSeparator7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(save, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(undo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(setFontSize, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(textColor, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(backgroundColor, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jSeparator8, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(redo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jSeparator5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jSeparator6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(open, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(saveAs, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(bold, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(plain, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(italic, javax.swing.GroupLayout.Alignment.TRAILING))
-                        .addGap(6, 6, 6)
-                        .addComponent(jTabbedPane1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(position)
-                        .addGap(0, 0, Short.MAX_VALUE))))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(22, 22, 22)
-                .addComponent(jLabel2)
-                .addGap(566, 566, 566))
+                    .addComponent(position, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(save, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(setFontSize, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jSeparator5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jSeparator6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(open, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(saveAs, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bold, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(plain, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(italic)
+                        .addComponent(boldItalic))
+                    .addComponent(jSeparator7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(undo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(backgroundColor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGap(10, 10, 10)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(textColor, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jSeparator8, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(redo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE))
         );
 
         jTabbedPane1.getAccessibleContext().setAccessibleName("");
@@ -531,6 +548,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
         /*check if user clicked mouse button for opening context menu
         (usually right click)*/
         final int i = jTabbedPane1.getSelectedIndex();
+        int menuShortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         if(e.isPopupTrigger()) {
             switch(i) {
                 case TAB_1: 
@@ -549,13 +567,6 @@ public class BeleskeGUI extends javax.swing.JFrame {
                     selected = jTextArea5.getSelectionStart() != jTextArea5.getSelectionEnd(); 
                     break;
             }
-            /*keyboard shortcuts for menu items
-            do I need to explain what do these do!?*/
-            KeyStroke ctrlC = KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
-            KeyStroke ctrlV = KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
-            KeyStroke ctrlX = KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
-            KeyStroke ctrlN = KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
-            KeyStroke ctrlM = KeyStroke.getKeyStroke(KeyEvent.VK_M, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
             JPopupMenu menu = new JPopupMenu();
             JMenuItem cut = new JMenuItem(new DefaultEditorKit.CutAction());
             JMenuItem copy = new JMenuItem(new DefaultEditorKit.CopyAction());
@@ -582,7 +593,8 @@ public class BeleskeGUI extends javax.swing.JFrame {
                             jTextArea5.replaceSelection(null); 
                             break;
                     }
-                } } );
+                } 
+            } );
             nextTab.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) { 
                     moveTab(NEXT_TAB); 
@@ -596,11 +608,11 @@ public class BeleskeGUI extends javax.swing.JFrame {
             cut.setText("Cut");
             copy.setText("Copy");
             paste.setText("Paste");
-            cut.setAccelerator(ctrlX);
-            copy.setAccelerator(ctrlC);
-            paste.setAccelerator(ctrlV);
-            nextTab.setAccelerator(ctrlM);
-            previousTab.setAccelerator(ctrlN);
+            cut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, menuShortcutKeyMask));
+            copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, menuShortcutKeyMask));
+            paste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, menuShortcutKeyMask));
+            nextTab.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, menuShortcutKeyMask));
+            previousTab.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutKeyMask));
             cut.setEnabled(selected);
             copy.setEnabled(selected);
             delete.setEnabled(selected);
@@ -638,50 +650,52 @@ public class BeleskeGUI extends javax.swing.JFrame {
         //it's obvious why
         saveAs();
     }//GEN-LAST:event_saveAsMouseClicked
+    //save
+    private void save() {
+        String[] text = null;
+        int i = jTabbedPane1.getSelectedIndex();
+        switch(i) {
+            case TAB_1:
+                text = jTextArea1.getText().split("\n");
+                break;
+            case TAB_2:
+                text = jTextArea2.getText().split("\n");
+                break;
+            case TAB_3:
+                text = jTextArea3.getText().split("\n");
+                break;
+            case TAB_4:
+                text = jTextArea4.getText().split("\n");
+                break;
+            case TAB_5:
+                text = jTextArea5.getText().split("\n");
+                break;
+        }
+        try(PrintWriter printWriter = new PrintWriter(path[i])) {
+            for(String text1 : text) 
+                printWriter.println(text1);
+        } catch(IOException | NullPointerException e) {
+            JOptionPane.showMessageDialog(null, "Invalid file.\nClose all programs and try again.");
+        }
+        saved[i] = true;
+        updateInfo(i);
+    } 
     //save file as
     private void saveAs() {
         fileChooser.showSaveDialog(this);
         File file = fileChooser.getSelectedFile();
-        PrintWriter printWriter = null;
+        String title = file.getName();
         int i = jTabbedPane1.getSelectedIndex();
-        try {
-            path = file.getAbsolutePath();
-            printWriter = new PrintWriter(path);
-            switch(i) {
-                case TAB_1: 
-                    for(String text1 : jTextArea1.getText().split("\n")) 
-                        printWriter.println(text1); 
-                    break;
-                case TAB_2: 
-                    for(String text1 : jTextArea2.getText().split("\n")) 
-                        printWriter.println(text1); 
-                    break;
-                case TAB_3: 
-                    for(String text1 : jTextArea3.getText().split("\n")) 
-                        printWriter.println(text1); 
-                    break;
-                case TAB_4: 
-                    for(String text1 : jTextArea4.getText().split("\n")) 
-                        printWriter.println(text1); 
-                    break;
-                case TAB_5: 
-                    for(String text1 : jTextArea5.getText().split("\n")) 
-                        printWriter.println(text1); 
-                    break;
-            }
-            saved[i] = true;
-            jTabbedPane1.setTitleAt(i, file.getName());
-            updateInfo(i);
-        } catch(IOException | NullPointerException e) {
-            JOptionPane.showMessageDialog(null, "Invalid file.\nClose all programs and try again.");
-        } finally { 
-            printWriter.close(); 
-        }
+        path[i] = file.getAbsolutePath();
+        save();
+        setTitle("Notes - " + title);
+        jTabbedPane1.setTitleAt(i, title);
     }
     //change info shown in ribbon when user changes tab
     private void updateInfo(int i) {
         //change window title to title of the selcted tab
-        setTitle("Notes - " + jTabbedPane1.getTitleAt(i));
+        updateTitle(i);
+        Color background = getBackgroundColor(i), text = getTextColor(i);
         //change font style selected in ribbon
         switch(fontStyle[i]) {
             case Font.PLAIN: 
@@ -693,49 +707,60 @@ public class BeleskeGUI extends javax.swing.JFrame {
             case Font.ITALIC: 
                 italic.setSelected(true); 
                 break;
+            case Font.BOLD + Font.ITALIC:
+                boldItalic.setSelected(true);
+                break;
         }
         //change text color selected in ribbon
-        if(background[i].equals(Color.WHITE)) 
-            textColor.setSelectedIndex(WHITE); 
-        else if(background[i].equals(Color.BLACK)) 
-            textColor.setSelectedIndex(BLACK); 
-        else if(background[i].equals(Color.GRAY)) 
-            textColor.setSelectedIndex(GRAY); 
-        else if(background[i].equals(Color.LIGHT_GRAY)) 
-            textColor.setSelectedIndex(LIGHT_GRAY); 
-        else if(background[i].equals(Color.DARK_GRAY)) 
-            textColor.setSelectedIndex(DARK_GRAY); 
-        else if(background[i].equals(Color.YELLOW)) 
-            textColor.setSelectedIndex(YELLOW); 
-        else if(background[i].equals(Color.BLUE)) 
-            textColor.setSelectedIndex(BLUE); 
-        else if(background[i].equals(Color.RED)) 
-            textColor.setSelectedIndex(RED); 
-        else if(background[i].equals(Color.GREEN)) 
-            textColor.setSelectedIndex(GREEN); 
-        else if(background[i].equals(Color.ORANGE)) 
-            textColor.setSelectedIndex(ORANGE);
-        //change background color selected in ribbon
-        if(text[i].equals(Color.WHITE))
-                backgroundColor.setSelectedIndex(WHITE); 
-        else if(text[i].equals(Color.BLACK)) 
+        if(background.equals(Color.WHITE)) 
+            backgroundColor.setSelectedIndex(WHITE); 
+        else if(background.equals(Color.BLACK)) 
             backgroundColor.setSelectedIndex(BLACK); 
-        else if(text[i].equals(Color.GRAY)) 
+        else if(background.equals(Color.GRAY)) 
             backgroundColor.setSelectedIndex(GRAY); 
-        else if(text[i].equals(Color.LIGHT_GRAY)) 
+        else if(background.equals(Color.LIGHT_GRAY)) 
             backgroundColor.setSelectedIndex(LIGHT_GRAY); 
-        else if(text[i].equals(Color.DARK_GRAY)) 
-            backgroundColor.setSelectedIndex(DARK_GRAY);
-        else if(text[i].equals(Color.YELLOW)) 
+        else if(background.equals(Color.DARK_GRAY)) 
+            backgroundColor.setSelectedIndex(DARK_GRAY); 
+        else if(background.equals(Color.YELLOW)) 
             backgroundColor.setSelectedIndex(YELLOW); 
-        else if(text[i].equals(Color.BLUE)) 
+        else if(background.equals(Color.BLUE)) 
             backgroundColor.setSelectedIndex(BLUE); 
-        else if(text[i].equals(Color.RED)) 
+        else if(background.equals(Color.RED)) 
             backgroundColor.setSelectedIndex(RED); 
-        else if(text[i].equals(Color.GREEN)) 
+        else if(background.equals(Color.GREEN)) 
             backgroundColor.setSelectedIndex(GREEN); 
-        else if(text[i].equals(Color.ORANGE)) 
+        else if(background.equals(Color.ORANGE)) 
             backgroundColor.setSelectedIndex(ORANGE);
+        else if(background.equals(Color.PINK))
+            backgroundColor.setSelectedIndex(PINK);
+        else
+            backgroundColor.setSelectedIndex(CUSTOM);
+        //change background color selected in ribbon
+        if(text.equals(Color.WHITE))
+            textColor.setSelectedIndex(WHITE); 
+        else if(text.equals(Color.BLACK)) 
+            textColor.setSelectedIndex(BLACK); 
+        else if(text.equals(Color.GRAY)) 
+            textColor.setSelectedIndex(GRAY); 
+        else if(text.equals(Color.LIGHT_GRAY)) 
+            textColor.setSelectedIndex(LIGHT_GRAY); 
+        else if(text.equals(Color.DARK_GRAY)) 
+            textColor.setSelectedIndex(DARK_GRAY);
+        else if(text.equals(Color.YELLOW)) 
+            textColor.setSelectedIndex(YELLOW); 
+        else if(text.equals(Color.BLUE)) 
+            textColor.setSelectedIndex(BLUE); 
+        else if(text.equals(Color.RED)) 
+            textColor.setSelectedIndex(RED); 
+        else if(text.equals(Color.GREEN)) 
+            textColor.setSelectedIndex(GREEN); 
+        else if(text.equals(Color.ORANGE)) 
+            textColor.setSelectedIndex(ORANGE);
+        else if(text.equals(Color.PINK))
+            textColor.setSelectedIndex(PINK);
+        else
+            textColor.setSelectedIndex(CUSTOM);
         //change font size selected in ribbon
         switch(fontSize[i]) {
             case 3: 
@@ -778,62 +803,144 @@ public class BeleskeGUI extends javax.swing.JFrame {
         //show the cursor location
         updatePosition(i);
     }
+    private Color getBackgroundColor(int tab) {
+        switch(tab) {
+            case TAB_1:
+                return jTextArea1.getBackground();
+            case TAB_2:
+                return jTextArea2.getBackground();
+            case TAB_3:
+                return jTextArea3.getBackground();
+            case TAB_4:
+                return jTextArea4.getBackground();
+            case TAB_5:
+                return jTextArea5.getBackground();
+        }
+        return null;
+    }
+    private void setBackgroundColor(Color background, int tab) {
+        switch(tab) {
+            case TAB_1: 
+                jTextArea1.setBackground(background); 
+                break;
+            case TAB_2: 
+                jTextArea2.setBackground(background); 
+                break;
+            case TAB_3: 
+                jTextArea3.setBackground(background); 
+                break;
+            case TAB_4: 
+                jTextArea4.setBackground(background); 
+                break;
+            case TAB_5: 
+                jTextArea5.setBackground(background); 
+                break;
+        }
+    }
+    private Color getTextColor(int tab) {
+        switch(tab) {
+            case TAB_1:
+                return jTextArea1.getForeground();
+            case TAB_2:
+                return jTextArea2.getForeground();
+            case TAB_3:
+                return jTextArea3.getForeground();
+            case TAB_4:
+                return jTextArea4.getForeground();
+            case TAB_5:
+                return jTextArea5.getForeground();
+        }
+        return null;
+    }
+    private void setTextColor(Color text, int tab) {
+        switch(tab) {
+            case TAB_1:
+                jTextArea1.setForeground(text);
+                break;
+            case TAB_2:
+                jTextArea2.setForeground(text);
+                break;
+            case TAB_3:
+                jTextArea3.setForeground(text);
+                break;
+            case TAB_4:
+                jTextArea4.setForeground(text);
+                break;
+            case TAB_5:
+                jTextArea5.setForeground(text);
+                break;
+        }
+    }
     //change font size and type of current tab
-    private void setFont() {
+    private void setFont(int fontStyle, int fontSize) {
         /*makes code easier to understand
         also method calls are expensive so this will make code slightly faster*/
         int i = jTabbedPane1.getSelectedIndex();
+        this.fontStyle[i] = fontStyle;
+        this.fontSize[i] = fontSize;
         switch(i) {
             case TAB_1: 
-                jTextArea1.setFont(new Font(Font.SANS_SERIF, fontStyle[i], fontSize[i])); 
+                jTextArea1.setFont(new Font(Font.SANS_SERIF, this.fontStyle[i], this.fontSize[i])); 
                 break;
             case TAB_2: 
-                jTextArea2.setFont(new Font(Font.SANS_SERIF, fontStyle[i], fontSize[i])); 
+                jTextArea2.setFont(new Font(Font.SANS_SERIF, this.fontStyle[i], this.fontSize[i])); 
                 break;
             case TAB_3: 
-                jTextArea3.setFont(new Font(Font.SANS_SERIF, fontStyle[i], fontSize[i])); 
+                jTextArea3.setFont(new Font(Font.SANS_SERIF, this.fontStyle[i], this.fontSize[i])); 
                 break;
             case TAB_4: 
-                jTextArea4.setFont(new Font(Font.SANS_SERIF, fontStyle[i], fontSize[i])); 
+                jTextArea4.setFont(new Font(Font.SANS_SERIF, this.fontStyle[i], this.fontSize[i])); 
                 break;
             case TAB_5: 
-                jTextArea5.setFont(new Font(Font.SANS_SERIF, fontStyle[i], fontSize[i])); 
+                jTextArea5.setFont(new Font(Font.SANS_SERIF, this.fontStyle[i], this.fontSize[i])); 
                 break;
         }
     }
     private void updatePosition(int i) {
         switch(i) {
             case TAB_1:
-                position.setText("Position: " + jTextArea1.getCaret().getDot());
+                position.setText("Position: " + jTextArea1.getCaret().getDot() + "/" + jTextArea1.getText().length());
                 break;
             case TAB_2:
-                position.setText("Position: " + jTextArea2.getCaret().getDot());
+                position.setText("Position: " + jTextArea2.getCaret().getDot() + "/" + jTextArea2.getText().length());
                 break;
             case TAB_3:
-                position.setText("Position: " + jTextArea3.getCaret().getDot());
+                position.setText("Position: " + jTextArea3.getCaret().getDot() + "/" + jTextArea3.getText().length());
                 break;
             case TAB_4:
-                position.setText("Position: " + jTextArea4.getCaret().getDot());
+                position.setText("Position: " + jTextArea4.getCaret().getDot() + "/" + jTextArea4.getText().length());
                 break;
             case TAB_5:
-                position.setText("Position: " + jTextArea5.getCaret().getDot());
+                position.setText("Position: " + jTextArea5.getCaret().getDot() + "/" + jTextArea5.getText().length());
                 break;
         }
+    }
+    private void updateTitle(int i) {
+        String title = jTabbedPane1.getTitleAt(i);
+        int title_length = title.length() - 1;
+        if(!saved[i]) {
+            if(title.charAt(title_length) != '*')
+                title = title.concat("*");
+        } else if(title.charAt(title_length) == '*')
+            title = title.substring(0, title_length);
+        jTabbedPane1.setTitleAt(i, title);
+        setTitle("Notes - " + title);
     }
     //open file
     private void openMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_openMouseClicked
         //check if user saved his work
-        if(saved[jTabbedPane1.getSelectedIndex()] == false) 
-            if(JOptionPane.showConfirmDialog(this, "Do you want to save changes?", jTabbedPane1.getTitleAt(jTabbedPane1.getSelectedIndex()), JOptionPane.YES_NO_OPTION) == 0) 
-                saveAs();
+        int i = jTabbedPane1.getSelectedIndex();
+        if(!saved[i]) 
+            if(JOptionPane.showConfirmDialog(this, "Do you want to save changes?", 
+                jTabbedPane1.getTitleAt(i), JOptionPane.YES_NO_OPTION) == 0) 
+                if(true)
+                    saveMouseClicked(null);
         if(fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
-            path = file.getAbsolutePath();
-            BufferedReader bufferedReader = null;
+            path[i] = file.getAbsolutePath();
             String line = null;
-            try {
-                bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(path), "UTF-8"));
-                switch(jTabbedPane1.getSelectedIndex()) {
+            try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(path[i]), "UTF-8"))) {
+                switch(i) {
                     case TAB_1:
                         jTextArea1.setText(null);
                         while((line = bufferedReader.readLine()) != null) 
@@ -860,152 +967,129 @@ public class BeleskeGUI extends javax.swing.JFrame {
                             jTextArea5.append(line + "\n"); 
                         break;
                 }
-                int i = jTabbedPane1.getSelectedIndex();
+                i = jTabbedPane1.getSelectedIndex();
                 jTabbedPane1.setTitleAt(i, file.getName());
                 updateInfo(i);
                 undo.setEnabled(false);
                 redo.setEnabled(false);
             } catch (IOException | NullPointerException e) {
                 JOptionPane.showMessageDialog(null, "Invalid file.\nClose all programs and try again.");
-            } finally {  
-                try { 
-                    bufferedReader.close();
-                } catch (IOException | NullPointerException ex) {
-                    //fucks ain't given here ya know
-                }
             }
         }
     }//GEN-LAST:event_openMouseClicked
     //change font type to plain
     private void plainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plainActionPerformed
-        fontStyle[jTabbedPane1.getSelectedIndex()] = Font.PLAIN;
-        setFont();
+        setFont(Font.PLAIN, fontSize[jTabbedPane1.getSelectedIndex()]);
     }//GEN-LAST:event_plainActionPerformed
     //change font type to bold
     private void boldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boldActionPerformed
-        fontStyle[jTabbedPane1.getSelectedIndex()] = Font.BOLD;
-        setFont();
+        setFont(Font.BOLD, fontSize[jTabbedPane1.getSelectedIndex()]);
     }//GEN-LAST:event_boldActionPerformed
     //change font type to italic
     private void italicActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_italicActionPerformed
-        fontStyle[jTabbedPane1.getSelectedIndex()] = Font.ITALIC;
-        setFont();
+        setFont(Font.ITALIC, fontSize[jTabbedPane1.getSelectedIndex()]);
     }//GEN-LAST:event_italicActionPerformed
     //change background color of each idividual text area 
-    private void textColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textColorActionPerformed
+    private void backgroundColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backgroundColorActionPerformed
         /*it is fucking more readable, ain't it??
         method calls are also expensive*/
         int i = jTabbedPane1.getSelectedIndex();
-        switch(textColor.getSelectedIndex()) {                                  
-            case WHITE: 
-                background[i] = Color.WHITE; 
-                break;
-            case BLACK: 
-                background[i] = Color.BLACK; 
-                break;
-            case GRAY: 
-                background[i] = Color.GRAY; 
-                break;
-            case LIGHT_GRAY: 
-                background[i] = Color.LIGHT_GRAY; 
-                break;
-            case DARK_GRAY: 
-                background[i] = Color.DARK_GRAY; 
-                break;
-            case YELLOW: 
-                background[i] = Color.YELLOW; 
-                break;
-            case BLUE: 
-                background[i] = Color.BLUE; 
-                break;
-            case RED: 
-                background[i] = Color.RED; 
-                break;
-            case GREEN: 
-                background[i] = Color.GREEN; 
-                break;
-            case ORANGE:
-                background[i] = Color.ORANGE; 
-                break;
-        }
-        switch(i) {
-            case TAB_1: 
-                jTextArea1.setBackground(background[i]); 
-                break;
-            case TAB_2: 
-                jTextArea2.setBackground(background[i]); 
-                break;
-            case TAB_3: 
-                jTextArea3.setBackground(background[i]); 
-                break;
-            case TAB_4: 
-                jTextArea4.setBackground(background[i]); 
-                break;
-            case TAB_5: 
-                jTextArea5.setBackground(background[i]); 
-                break;
-        }
-    }//GEN-LAST:event_textColorActionPerformed
-    //change foreground color of each individual text area  
-    private void backgroundColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backgroundColorActionPerformed
-        int i = jTabbedPane1.getSelectedIndex();
         switch(backgroundColor.getSelectedIndex()) {                                  
             case WHITE: 
-                text[i] = Color.WHITE; 
+                setBackgroundColor(Color.WHITE, i); 
                 break;
             case BLACK: 
-                text[i] = Color.BLACK; 
+                setBackgroundColor(Color.BLACK, i); 
                 break;
-            case GRAY:
-                text[i] = Color.GRAY; 
+            case GRAY: 
+                setBackgroundColor(Color.GRAY, i); 
                 break;
             case LIGHT_GRAY: 
-                text[i] = Color.LIGHT_GRAY; 
+                setBackgroundColor(Color.LIGHT_GRAY, i); 
                 break;
             case DARK_GRAY: 
-                text[i] = Color.DARK_GRAY; 
+                setBackgroundColor(Color.DARK_GRAY, i); 
                 break;
             case YELLOW: 
-                text[i] = Color.YELLOW; 
+                setBackgroundColor(Color.YELLOW, i); 
                 break;
             case BLUE: 
-                text[i] = Color.BLUE;
+                setBackgroundColor(Color.BLUE, i); 
                 break;
             case RED: 
-                text[i] = Color.RED; 
+                setBackgroundColor(Color.RED, i); 
                 break;
             case GREEN: 
-                text[i] = Color.GREEN; 
+                setBackgroundColor(Color.GREEN, i); 
                 break;
-            case ORANGE: 
-                text[i] = Color.ORANGE; 
+            case ORANGE:
+                setBackgroundColor(Color.ORANGE, i); 
                 break;
-        }
-        switch(i) {
-            case TAB_1: 
-                jTextArea1.setForeground(text[i]); 
+            case PINK:
+                setBackgroundColor(Color.PINK, i);
                 break;
-            case TAB_2:
-                jTextArea2.setForeground(text[i]); 
+            case CUSTOM:
+                setBackgroundColor(customBackground[i], i);
                 break;
-            case TAB_3: 
-                jTextArea3.setForeground(text[i]); 
-                break;
-            case TAB_4: 
-                jTextArea4.setForeground(text[i]); 
-                break;
-            case TAB_5: 
-                jTextArea5.setForeground(text[i]); 
+            case NEW_COLOR:
+                customBackground[i] = JColorChooser.showDialog(this, "New color", customBackground[i]);
+                backgroundColor.setSelectedIndex(CUSTOM);
+                setBackgroundColor(customBackground[i], i);
                 break;
         }
     }//GEN-LAST:event_backgroundColorActionPerformed
+    //change foreground color of each individual text area  
+    private void textColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textColorActionPerformed
+        int i = jTabbedPane1.getSelectedIndex();
+        switch(textColor.getSelectedIndex()) {                                  
+            case WHITE: 
+                setTextColor(Color.WHITE, i); 
+                break;
+            case BLACK: 
+                setTextColor(Color.BLACK, i); 
+                break;
+            case GRAY:
+                setTextColor(Color.GRAY, i); 
+                break;
+            case LIGHT_GRAY: 
+                setTextColor(Color.LIGHT_GRAY, i); 
+                break;
+            case DARK_GRAY: 
+                setTextColor(Color.DARK_GRAY, i); 
+                break;
+            case YELLOW: 
+                setTextColor(Color.YELLOW, i); 
+                break;
+            case BLUE: 
+                setTextColor(Color.BLUE, i);
+                break;
+            case RED: 
+                setTextColor(Color.RED, i); 
+                break;
+            case GREEN: 
+                setTextColor(Color.GREEN, i); 
+                break;
+            case ORANGE: 
+                setTextColor(Color.ORANGE, i); 
+                break;
+            case PINK:
+                setTextColor(Color.PINK, i);
+                break;
+            case CUSTOM:
+                setTextColor(customText[i], i);
+                break;
+            case NEW_COLOR:
+                customText[i] = JColorChooser.showDialog(this, "New color", customBackground[i]);
+                textColor.setSelectedIndex(CUSTOM);
+                setTextColor(customText[i], i);
+                break;
+        }
+    }//GEN-LAST:event_textColorActionPerformed
     //change font size of each individual text area
     private void setFontSizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setFontSizeActionPerformed
         /*there is no way for an exception to be thrown here
         cause jcombobox ain't editable*/
-        int i = jTabbedPane1.getSelectedIndex();
-        fontSize[i] = Integer.parseInt(setFontSize.getSelectedItem().toString());
-        setFont();
+        setFont(fontStyle[jTabbedPane1.getSelectedIndex()], Integer.parseInt(setFontSize.getSelectedItem().toString()));
     }//GEN-LAST:event_setFontSizeActionPerformed
     //check if user saved his work before exiting
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
@@ -1014,34 +1098,22 @@ public class BeleskeGUI extends javax.swing.JFrame {
             need to call moveTab to check if user is trying 
             to do something that he shouldn't do*/ 
             jTabbedPane1.setSelectedIndex(i);
+            updateTitle(i);
             if(saved[jTabbedPane1.getSelectedIndex()] == false) 
-                if(JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Exit - " + jTabbedPane1.getTitleAt(jTabbedPane1.getSelectedIndex()), JOptionPane.YES_NO_OPTION) == 0) 
-                    saveAs();
+                if(JOptionPane.showConfirmDialog(this, "Do you want to save changes?", 
+                    "Exit - " + jTabbedPane1.getTitleAt(jTabbedPane1.getSelectedIndex()), JOptionPane.YES_NO_OPTION) == 0) 
+                    saveMouseClicked(null);
         }
     }//GEN-LAST:event_formWindowClosing
     //save file 
     private void saveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_saveMouseClicked
         /*save changes to a modified file or 
         save file as if file does not exist*/
-        if(path == null) 
+        int i = jTabbedPane1.getSelectedIndex();
+        if(path[i] == null) 
             saveAs(); 
-        else {
-            PrintWriter printWriter = null;
-            try {
-                printWriter = new PrintWriter(path);
-                for(String text1 : jTextArea1.getText().split("\n")) 
-                    printWriter.println(text1);
-                saved[jTabbedPane1.getSelectedIndex()] = true;
-            } catch(IOException | NullPointerException e) {
-                JOptionPane.showMessageDialog(null, "Invalid file. Close all programs and try again.");
-            } finally {
-                try {
-                    printWriter.close();
-                } catch(NullPointerException e) {
-                    //fucks ain't given here ya know
-                }
-            }
-        }
+        else
+            save();
     }//GEN-LAST:event_saveMouseClicked
 
     //mouse listener would work even if the button is disabled
@@ -1070,7 +1142,15 @@ public class BeleskeGUI extends javax.swing.JFrame {
         saved[i] = false;
         undo.setEnabled(true);
         updatePosition(i);
+        updateTitle(i);
     }//GEN-LAST:event_jTextArea1KeyPressed
+    /*change font style to bold italic
+    P.S. NetBeans you asshole I can't even edit variables, so I have those 4 
+    button groups and I can't group methods well
+    I can't manually edit initComponents so I am forced to point and click to add a listener*/
+    private void boldItalicActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boldItalicActionPerformed
+        setFont(Font.ITALIC + Font.BOLD, fontSize[jTabbedPane1.getSelectedIndex()]);
+    }//GEN-LAST:event_boldItalicActionPerformed
     public static void main(String args[]) throws FileNotFoundException {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -1109,6 +1189,7 @@ public class BeleskeGUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox backgroundColor;
     private javax.swing.JRadioButton bold;
+    private javax.swing.JRadioButton boldItalic;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.ButtonGroup buttonGroup3;
